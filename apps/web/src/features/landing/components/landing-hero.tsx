@@ -1,7 +1,8 @@
 import { ArrowDown, ArrowUpRight } from "lucide-react";
-import Link from "next/link";
 import { BrandLogo } from "@/common/components/brand-logo";
+import { ThemeToggle } from "@/common/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { MotionReveal } from "./motion-reveal";
 
 export function LandingHero() {
   return (
@@ -11,45 +12,56 @@ export function LandingHero() {
         <div className="nav-links">
           <a href="#como-funciona">Como funciona</a>
           <a href="#ritmo">Seu ritmo</a>
-          <Link href="/assistente">Assistente</Link>
+          <a href="#assistente">Assistente</a>
         </div>
-        <Button asChild className="nav-cta" variant="ghost">
-          <Link href="/assistente">
-            Abrir o Dreli <ArrowUpRight />
-          </Link>
-        </Button>
-      </nav>
-      <div className="hero-content shell">
-        <div className="eyebrow">
-          <span /> Um espaço pessoal, do seu jeito
-        </div>
-        <h1>
-          Menos abas abertas.
-          <br />
-          Mais espaço na cabeça.
-        </h1>
-        <p className="hero-copy">
-          Dreli reúne o que você quer lembrar, o que importa hoje e o ritmo que
-          você está construindo — sem transformar sua vida em mais um projeto
-          para gerenciar.
-        </p>
-        <div className="hero-actions">
-          <Button asChild className="hero-primary" size="lg">
-            <Link href="/assistente">
-              Começar com o Dreli <ArrowUpRight />
-            </Link>
-          </Button>
-          <Button
-            asChild
-            className="hero-secondary"
-            size="lg"
-            variant="outline"
-          >
-            <a href="#como-funciona">
-              Conhecer por dentro <ArrowDown />
+        <div className="nav-actions">
+          <ThemeToggle />
+          <Button asChild className="nav-cta" variant="ghost">
+            <a href="#assistente">
+              Conhecer <ArrowUpRight />
             </a>
           </Button>
         </div>
+      </nav>
+      <div className="hero-content shell">
+        <MotionReveal>
+          <div className="eyebrow">
+            <span /> Um espaço pessoal, do seu jeito
+          </div>
+        </MotionReveal>
+        <MotionReveal delay={0.05}>
+          <h1>
+            Menos abas abertas.
+            <br />
+            Mais espaço na cabeça.
+          </h1>
+        </MotionReveal>
+        <MotionReveal delay={0.1}>
+          <p className="hero-copy">
+            Dreli reúne o que você quer lembrar, o que importa hoje e o ritmo
+            que você está construindo — sem transformar sua vida em mais um
+            projeto para gerenciar.
+          </p>
+        </MotionReveal>
+        <MotionReveal delay={0.15}>
+          <div className="hero-actions">
+            <Button asChild className="hero-primary" size="lg">
+              <a href="#assistente">
+                Começar com o Dreli <ArrowUpRight />
+              </a>
+            </Button>
+            <Button
+              asChild
+              className="hero-secondary"
+              size="lg"
+              variant="outline"
+            >
+              <a href="#como-funciona">
+                Conhecer por dentro <ArrowDown />
+              </a>
+            </Button>
+          </div>
+        </MotionReveal>
       </div>
     </section>
   );

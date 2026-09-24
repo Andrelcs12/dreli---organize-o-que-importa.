@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { SplashScreen } from "@/common/components/splash-screen";
+import { ThemeProvider } from "@/common/components/theme-provider";
 import "./globals.css";
 
 const siteUrl = new URL(
@@ -11,6 +13,11 @@ export const metadata: Metadata = {
     "Seu espaço pessoal para organizar informações, acompanhar prioridades e manter clareza sobre o que importa.",
   applicationName: "Dreli",
   metadataBase: siteUrl,
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/icon.png", type: "image/png" }],
+    shortcut: ["/icon.png"],
+  },
   keywords: [
     "organização pessoal",
     "tarefas",
@@ -52,14 +59,22 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5f3ee",
-  colorScheme: "light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f0e7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1e29" },
+  ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR">
-      <body className="antialiased">{children}</body>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className="antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SplashScreen />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
