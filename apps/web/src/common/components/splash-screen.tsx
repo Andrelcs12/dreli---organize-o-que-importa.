@@ -6,31 +6,39 @@ import { useEffect, useLayoutEffect, useState } from "react";
 
 const sessionKey = "dreli:splash-seen";
 const exitDelay = 2200;
+const developmentPreviewDelay = 4200;
 
 const strokeVariants = [
-  { clipPath: "inset(0 0 66.66% 0)", delay: 0.2 },
-  { clipPath: "inset(33.33% 0 33.33% 0)", delay: 0.31 },
-  { clipPath: "inset(66.66% 0 0 0)", delay: 0.42 },
+  { className: "splash-reveal-mask-top", delay: 0.2 },
+  { className: "splash-reveal-mask-middle", delay: 0.31 },
+  { className: "splash-reveal-mask-bottom", delay: 0.42 },
 ];
 
 export function SplashScreen() {
   const [visible, setVisible] = useState(true);
   const [leaving, setLeaving] = useState(false);
   const reduceMotion = useReducedMotion();
+  const isDevelopmentPreview = process.env.NODE_ENV === "development";
 
   useLayoutEffect(() => {
+    if (isDevelopmentPreview) return;
+
     if (sessionStorage.getItem(sessionKey)) setVisible(false);
     else sessionStorage.setItem(sessionKey, "true");
-  }, []);
+  }, [isDevelopmentPreview]);
 
   useEffect(() => {
     if (!visible) return;
     const timer = window.setTimeout(
       () => setLeaving(true),
-      reduceMotion ? 120 : exitDelay,
+      reduceMotion
+        ? 120
+        : isDevelopmentPreview
+          ? developmentPreviewDelay
+          : exitDelay,
     );
     return () => window.clearTimeout(timer);
-  }, [reduceMotion, visible]);
+  }, [isDevelopmentPreview, reduceMotion, visible]);
 
   if (!visible) return null;
 
@@ -49,32 +57,26 @@ export function SplashScreen() {
       }}
     >
       <motion.div
-        animate={
-          leaving
-            ? { opacity: 0, y: -5 }
-            : { opacity: 1, y: 0, scale: reduceMotion ? 1 : [0.98, 0.98, 1] }
-        }
+        animate={leaving ? { opacity: 0, y: -5 } : { opacity: 1, y: 0 }}
         className="splash-brand"
-        initial={reduceMotion ? false : { scale: 0.98 }}
+        initial={false}
         transition={{
-          duration: reduceMotion ? 0.01 : 1.2,
+          duration: reduceMotion ? 0.01 : leaving ? 0.28 : 0,
           ease: [0.22, 1, 0.36, 1],
-          times: [0, 0.72, 1],
         }}
       >
         <div aria-hidden="true" className="splash-symbol">
-          {strokeVariants.map(({ clipPath, delay }) => (
-            <motion.div
-              animate={{ opacity: 1, x: 0 }}
-              className="splash-stroke"
-              initial={reduceMotion ? false : { opacity: 0, x: -12 }}
-              key={clipPath}
-              style={{ clipPath }}
-              transition={{ duration: 0.42, delay, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Image alt="" fill priority sizes="132px" src="/icon.png" />
-            </motion.div>
-          ))}
+          <Image alt="" fill priority sizes="132px" src="/icon.png" />
+          {!reduceMotion &&
+            strokeVariants.map(({ className, delay }) => (
+              <motion.div
+                animate={{ clipPath: "inset(0 0 0 100%)", opacity: 0 }}
+                className={`splash-reveal-mask ${className}`}
+                initial={{ clipPath: "inset(0 0 0 0)", opacity: 1 }}
+                key={className}
+                transition={{ duration: 0.42, delay, ease: [0.22, 1, 0.36, 1] }}
+              />
+            ))}
         </div>
 
         <motion.span
