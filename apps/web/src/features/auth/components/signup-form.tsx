@@ -1,14 +1,67 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createClient } from "@/lib/supabase/client";
 import { PasswordInput } from "./password-input";
 
 export function SignupForm() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); /* TODO: conectar Supabase Auth signUp. */
+  const [error, setError] = useState<string>();
+  const [notice, setNotice] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(undefined);
+    setNotice(undefined);
+    setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    const supabase = createClient();
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: String(formData.get("email") ?? ""),
+      password: String(formData.get("password") ?? ""),
+      options: {
+        data: { name: String(formData.get("name") ?? "").trim() },
+      },
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!data.session) {
+      setNotice("Confira seu e-mail para confirmar a conta e continuar.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    router.replace("/setup");
+    router.refresh();
+  }
+
+  async function handleGoogleSignIn() {
+    setError(undefined);
+    setNotice(undefined);
+    setIsSubmitting(true);
+
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setIsSubmitting(false);
+    }
   }
   return (
     <div>
@@ -48,11 +101,19 @@ export function SignupForm() {
             placeholder="Pelo menos 8 caracteres"
           />
         </div>
-        <p className="auth-error" role="alert" hidden>
-          Não foi possível criar sua conta. Tente novamente.
-        </p>
-        <Button className="auth-submit" size="lg" type="submit">
-          Criar conta
+        {error ? (
+          <p className="auth-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {notice ? <p className="auth-notice">{notice}</p> : null}
+        <Button
+          className="auth-submit"
+          disabled={isSubmitting}
+          size="lg"
+          type="submit"
+        >
+          {isSubmitting ? "Criando conta..." : "Criar conta"}
         </Button>
         <div className="auth-divider">
           <span />
@@ -61,6 +122,8 @@ export function SignupForm() {
         </div>
         <Button
           className="auth-google"
+          disabled={isSubmitting}
+          onClick={handleGoogleSignIn}
           size="lg"
           type="button"
           variant="outline"

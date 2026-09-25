@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { AnimatedNumber } from "./animated-number";
@@ -23,7 +24,13 @@ const steps = [
   ],
 ];
 
-export function LandingSections() {
+type LandingSectionsProps = {
+  authenticatedDestination?: "/app" | "/setup";
+};
+
+export function LandingSections({
+  authenticatedDestination,
+}: LandingSectionsProps) {
   return (
     <>
       <section id="como-funciona" className="steps shell">
@@ -78,13 +85,16 @@ export function LandingSections() {
       <section className="closing">
         <MotionReveal>
           <div className="shell">
-            <BrandLogo href="" tone="light" />
+            <BrandLogo href="/" tone="light" />
             <p>Own your rhythm.</p>
             <h2>Clareza para seguir em frente.</h2>
             <Button asChild className="closing-button" size="lg">
-              <a href="#assistente">
-                Começar pelo essencial <ArrowUpRight />
-              </a>
+              <Link href={authenticatedDestination ?? "/cadastro"}>
+                {authenticatedDestination
+                  ? "Abrir meu Dreli"
+                  : "Começar pelo essencial"}{" "}
+                <ArrowUpRight />
+              </Link>
             </Button>
           </div>
         </MotionReveal>

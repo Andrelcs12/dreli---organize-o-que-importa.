@@ -1,7 +1,23 @@
 import type { Metadata, Viewport } from "next";
+import { Manrope, Newsreader } from "next/font/google";
 import { SplashScreen } from "@/common/components/splash-screen";
 import { ThemeProvider } from "@/common/components/theme-provider";
 import "./globals.css";
+
+const newsreader = Newsreader({
+  display: "swap",
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400"],
+});
+
+const manrope = Manrope({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+});
 
 const siteUrl = new URL(
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreli.app",
@@ -68,7 +84,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html
+      className={`${newsreader.variable} ${manrope.variable}`}
+      lang="pt-BR"
+      suppressHydrationWarning
+    >
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SplashScreen />

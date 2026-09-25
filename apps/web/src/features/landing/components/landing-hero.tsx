@@ -1,11 +1,18 @@
 import { ArrowDown, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { ThemeToggle } from "@/common/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { HeroProductPreview } from "./hero-product-preview";
 import { MotionReveal } from "./motion-reveal";
 
-export function LandingHero() {
+type LandingHeroProps = {
+  authenticatedDestination?: "/app" | "/setup";
+};
+
+export function LandingHero({ authenticatedDestination }: LandingHeroProps) {
+  const primaryHref = authenticatedDestination ?? "/cadastro";
+  const primaryLabel = authenticatedDestination ? "Abrir Dreli" : "Começar";
   return (
     <section className="hero">
       <nav className="nav shell" aria-label="Navegação principal">
@@ -17,10 +24,13 @@ export function LandingHero() {
         </div>
         <div className="nav-actions">
           <ThemeToggle />
-          <Button asChild className="nav-cta" variant="ghost">
-            <a href="#assistente">
-              Conhecer <ArrowUpRight />
-            </a>
+          {!authenticatedDestination ? (
+            <Link className="nav-auth-login" href="/login">
+              Entrar
+            </Link>
+          ) : null}
+          <Button asChild className="nav-auth-signup" size="sm">
+            <Link href={primaryHref}>{primaryLabel}</Link>
           </Button>
         </div>
       </nav>
@@ -48,9 +58,12 @@ export function LandingHero() {
           <MotionReveal delay={0.15}>
             <div className="hero-actions">
               <Button asChild className="hero-primary" size="lg">
-                <a href="#assistente">
-                  Começar com o Dreli <ArrowUpRight />
-                </a>
+                <Link href={primaryHref}>
+                  {authenticatedDestination
+                    ? "Abrir Dreli"
+                    : "Começar com o Dreli"}{" "}
+                  <ArrowUpRight />
+                </Link>
               </Button>
               <Button
                 asChild

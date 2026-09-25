@@ -1,14 +1,55 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createClient } from "@/lib/supabase/client";
 import { PasswordInput } from "./password-input";
 
 export function LoginForm() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); /* TODO: conectar Supabase Auth signInWithPassword. */
+  const [error, setError] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(undefined);
+    setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: String(formData.get("email") ?? ""),
+      password: String(formData.get("password") ?? ""),
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    router.replace("/setup");
+    router.refresh();
+  }
+
+  async function handleGoogleSignIn() {
+    setError(undefined);
+    setIsSubmitting(true);
+
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setIsSubmitting(false);
+    }
   }
   return (
     <div>
@@ -40,11 +81,18 @@ export function LoginForm() {
             name="password"
           />
         </div>
-        <p className="auth-error" role="alert" hidden>
-          Não foi possível entrar. Revise seus dados e tente novamente.
-        </p>
-        <Button className="auth-submit" size="lg" type="submit">
-          Entrar
+        {error ? (
+          <p className="auth-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <Button
+          className="auth-submit"
+          disabled={isSubmitting}
+          size="lg"
+          type="submit"
+        >
+          {isSubmitting ? "Entrando..." : "Entrar"}
         </Button>
         <div className="auth-divider">
           <span />
@@ -53,6 +101,8 @@ export function LoginForm() {
         </div>
         <Button
           className="auth-google"
+          disabled={isSubmitting}
+          onClick={handleGoogleSignIn}
           size="lg"
           type="button"
           variant="outline"
