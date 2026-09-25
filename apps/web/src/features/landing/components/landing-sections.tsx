@@ -87,12 +87,16 @@ export function LandingSections({
           <div className="shell">
             <BrandLogo href="/" tone="light" />
             <p>Own your rhythm.</p>
-            <h2>Clareza para seguir em frente.</h2>
+            <h2>Seu ritmo, em um só lugar.</h2>
+            <p className="closing-copy">
+              Guarde o que importa, organize o que vem agora e continue sem
+              carregar tudo na cabeça.
+            </p>
             <Button asChild className="closing-button" size="lg">
               <Link href={authenticatedDestination ?? "/cadastro"}>
                 {authenticatedDestination
                   ? "Abrir meu Dreli"
-                  : "Começar pelo essencial"}{" "}
+                  : "Começar com o Dreli"}{" "}
                 <ArrowUpRight />
               </Link>
             </Button>

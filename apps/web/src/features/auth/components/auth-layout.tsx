@@ -19,7 +19,7 @@ export function AuthLayout({
       : "Um espaço tranquilo para o que você quer guardar.";
 
   return (
-    <main className="auth-shell">
+    <main className={`auth-shell auth-shell--${mode}`}>
       <section className="auth-form-column">
         <header className="auth-header">
           <BrandLogo />

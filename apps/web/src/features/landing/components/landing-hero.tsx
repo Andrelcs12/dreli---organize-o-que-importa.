@@ -29,7 +29,7 @@ export function LandingHero({ authenticatedDestination }: LandingHeroProps) {
               Entrar
             </Link>
           ) : null}
-          <Button asChild className="nav-auth-signup" size="sm">
+          <Button asChild size="sm">
             <Link href={primaryHref}>{primaryLabel}</Link>
           </Button>
         </div>
