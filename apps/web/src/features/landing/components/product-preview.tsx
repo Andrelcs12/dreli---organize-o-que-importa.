@@ -24,7 +24,7 @@ export function ProductPreview() {
       <div className="product-frame shell">
         <div className="app-window">
           <aside className="sidebar">
-            <BrandLogo href="" />
+            <BrandLogo />
             <div className="sidebar-section">VISÃO GERAL</div>
             {navigation.map(({ active, count, icon: Icon, label }) => (
               <div
@@ -81,18 +81,18 @@ export function ProductPreview() {
                   Dia leve, mas com chuva no fim da tarde. Reserve um tempo para
                   finalizar a autenticação.
                 </p>
-                <button type="button">
+                <span className="preview-inline-action">
                   Ler em 1 min <Sparkles />
-                </button>
+                </span>
               </section>
             </div>
             <div className="content-grid">
               <section className="list-card">
                 <div className="section-heading">
                   <h3>Para hoje</h3>
-                  <button type="button">
+                  <span className="preview-inline-action">
                     <Plus /> Adicionar
-                  </button>
+                  </span>
                 </div>
                 <div className="task done">
                   <i>

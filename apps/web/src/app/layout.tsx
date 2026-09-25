@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Newsreader } from "next/font/google";
+import { Manrope, Source_Serif_4 } from "next/font/google";
 import { SplashScreen } from "@/common/components/splash-screen";
 import { ThemeProvider } from "@/common/components/theme-provider";
 import "./globals.css";
 
-const newsreader = Newsreader({
+const sourceSerif = Source_Serif_4({
   display: "swap",
   style: ["normal", "italic"],
   subsets: ["latin"],
@@ -85,7 +85,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      className={`${newsreader.variable} ${manrope.variable}`}
+      className={`${sourceSerif.variable} ${manrope.variable}`}
       lang="pt-BR"
       suppressHydrationWarning
     >
