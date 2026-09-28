@@ -7,5 +7,14 @@ export function ThemeProvider({
   children,
   ...props
 }: ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  const scriptProps =
+    process.env.NODE_ENV === "development"
+      ? ({ type: "application/json" } as const)
+      : undefined;
+
+  return (
+    <NextThemesProvider {...props} scriptProps={scriptProps}>
+      {children}
+    </NextThemesProvider>
+  );
 }

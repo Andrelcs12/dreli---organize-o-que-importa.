@@ -25,7 +25,7 @@ const steps = [
 ];
 
 type LandingSectionsProps = {
-  authenticatedDestination?: "/app" | "/setup";
+  authenticatedDestination?: "/dashboard" | "/setup";
 };
 
 export function LandingSections({

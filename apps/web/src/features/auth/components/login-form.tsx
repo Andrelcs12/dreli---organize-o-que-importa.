@@ -7,6 +7,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
+import {
+  getSafePostAuthDestination,
+  getSetupPath,
+} from "../post-auth-destination";
 import { PasswordInput } from "./password-input";
 
 export function LoginForm() {
@@ -32,7 +36,9 @@ export function LoginForm() {
       return;
     }
 
-    router.replace("/setup");
+    router.replace(
+      getSetupPath(new URLSearchParams(window.location.search).get("next")),
+    );
     router.refresh();
   }
 
@@ -41,9 +47,18 @@ export function LoginForm() {
     setIsSubmitting(true);
 
     const supabase = createClient();
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    const next = getSafePostAuthDestination(
+      new URLSearchParams(window.location.search).get("next"),
+    );
+
+    if (next) {
+      callbackUrl.searchParams.set("next", next);
+    }
+
     const { error: signInError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: callbackUrl.toString() },
     });
 
     if (signInError) {

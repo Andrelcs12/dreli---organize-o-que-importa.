@@ -3,18 +3,28 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getSafePostAuthDestination } from "@/features/auth/post-auth-destination";
 import { createClient } from "@/lib/supabase/client";
 import { getApiUrl } from "@/lib/supabase/env";
 import type { PriorityId } from "../priorities";
-import { FinishStep } from "./finish-step";
+import {
+  type HomePreference,
+  HomePreferenceStep,
+} from "./home-preference-step";
 import { OnboardingLayout } from "./onboarding-layout";
 import { PrioritiesStep } from "./priorities-step";
 import { ProfileStep } from "./profile-step";
 
-export function OnboardingFlow() {
+export function OnboardingFlow({
+  initialName,
+}: {
+  initialName?: string | null;
+}) {
   const [step, setStep] = useState(0);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(initialName ?? "");
   const [priorities, setPriorities] = useState<PriorityId[]>([]);
+  const [currentFocus, setCurrentFocus] = useState("");
+  const [homePreference, setHomePreference] = useState<HomePreference>();
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -23,6 +33,11 @@ export function OnboardingFlow() {
   const nextProfileStep = () => {
     if (!name.trim()) {
       setError("Conte para o Dreli como podemos chamar você.");
+      return;
+    }
+
+    if (!currentFocus) {
+      setError("Escolha o que está ocupando sua atenção agora.");
       return;
     }
 
@@ -78,7 +93,12 @@ export function OnboardingFlow() {
 
     try {
       const response = await fetch(`${getApiUrl()}/profiles/me/onboarding`, {
-        body: JSON.stringify({ name: name.trim(), priorities }),
+        body: JSON.stringify({
+          name: name.trim(),
+          currentFocus: currentFocus.trim(),
+          priorities,
+          homePreference,
+        }),
         headers: {
           Authorization: `Bearer ${session.access_token}`,
           "Content-Type": "application/json",
@@ -96,7 +116,10 @@ export function OnboardingFlow() {
         throw new Error(message ?? "Não foi possível salvar seu espaço.");
       }
 
-      router.replace("/app");
+      const next = getSafePostAuthDestination(
+        new URLSearchParams(window.location.search).get("next"),
+      );
+      router.replace(next ?? "/dashboard");
       router.refresh();
     } catch (submissionError) {
       setError(
@@ -123,7 +146,16 @@ export function OnboardingFlow() {
             <ProfileStep
               error={error}
               name={name}
-              onChange={setName}
+              knownName={initialName}
+              currentFocus={currentFocus}
+              onCurrentFocusChange={(value) => {
+                setCurrentFocus(value);
+                setError(undefined);
+              }}
+              onChange={(value) => {
+                setName(value);
+                setError(undefined);
+              }}
               onSubmit={nextProfileStep}
             />
           ) : null}
@@ -137,13 +169,13 @@ export function OnboardingFlow() {
             />
           ) : null}
           {step === 2 ? (
-            <FinishStep
+            <HomePreferenceStep
               error={error}
               isSubmitting={isSubmitting}
-              name={name.trim()}
               onBack={back}
+              onSelect={setHomePreference}
               onSubmit={completeSetup}
-              selectedPriorities={priorities}
+              selected={homePreference}
             />
           ) : null}
         </motion.div>

@@ -2,7 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseEnvironment, isSupabaseConfigured } from "./env";
 
-const protectedPaths = ["/setup", "/app"];
+const protectedPaths = [
+  "/setup",
+  "/dashboard",
+  "/inbox",
+  "/library",
+  "/favorites",
+  "/app",
+];
 const authPaths = ["/login", "/cadastro"];
 
 export async function updateSession(request: NextRequest) {
@@ -40,7 +47,10 @@ export async function updateSession(request: NextRequest) {
   if (isProtected && !claims?.sub) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
-    loginUrl.searchParams.set("next", pathname);
+    loginUrl.searchParams.set(
+      "next",
+      pathname === "/app" ? "/dashboard" : pathname,
+    );
     const redirectResponse = NextResponse.redirect(loginUrl);
     response.cookies.getAll().forEach((cookie) => {
       redirectResponse.cookies.set(cookie);

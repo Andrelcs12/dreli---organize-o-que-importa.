@@ -7,7 +7,7 @@ import { HeroProductPreview } from "./hero-product-preview";
 import { MotionReveal } from "./motion-reveal";
 
 type LandingHeroProps = {
-  authenticatedDestination?: "/app" | "/setup";
+  authenticatedDestination?: "/dashboard" | "/setup";
 };
 
 export function LandingHero({ authenticatedDestination }: LandingHeroProps) {

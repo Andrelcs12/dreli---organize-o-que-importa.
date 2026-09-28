@@ -8,20 +8,14 @@ const stepDetails = [
     label: "Seu espaço",
     text: "Algumas escolhas simples para o Dreli começar no seu ritmo.",
   },
+  { label: "Por perto", text: "Escolha o que faz sentido acompanhar agora." },
   {
-    label: "Por perto",
-    text: "Escolha o que faz sentido acompanhar agora.",
-  },
-  {
-    label: "Pronto",
-    text: "Seu ponto de partida está tomando forma.",
+    label: "Primeira visão",
+    text: "Escolha o que deve aparecer primeiro ao abrir o Dreli.",
   },
 ];
 
-type OnboardingLayoutProps = {
-  children: React.ReactNode;
-  step: number;
-};
+type OnboardingLayoutProps = { children: React.ReactNode; step: number };
 
 export function OnboardingLayout({ children, step }: OnboardingLayoutProps) {
   const detail = stepDetails[step];

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getSetupPath } from "@/features/auth/post-auth-destination";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
@@ -10,7 +11,9 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(new URL("/setup", origin));
+      return NextResponse.redirect(
+        new URL(getSetupPath(searchParams.get("next")), origin),
+      );
     }
   }
 

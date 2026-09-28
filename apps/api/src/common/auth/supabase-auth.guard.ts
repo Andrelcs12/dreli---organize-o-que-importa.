@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
+import type { Request } from 'express';
 import type { AuthenticatedUser } from './authenticated-user.decorator.js';
 
 type RequestWithUser = Request & { user: AuthenticatedUser };
@@ -29,7 +30,7 @@ export class SupabaseAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const token = this.getBearerToken(request.headers.get('authorization'));
+    const token = this.getBearerToken(request.headers.authorization);
 
     if (!token) {
       throw new UnauthorizedException('Authentication is required.');
@@ -47,7 +48,7 @@ export class SupabaseAuthGuard implements CanActivate {
     }
   }
 
-  private getBearerToken(authorization: string | null) {
+  private getBearerToken(authorization: string | undefined) {
     const [scheme, token] = authorization?.split(' ') ?? [];
     return scheme === 'Bearer' && token ? token : undefined;
   }

@@ -5,12 +5,14 @@ import type { CompleteOnboardingDto } from './dto/complete-onboarding.dto.js';
 const priorityIds = [
   'day',
   'references',
-  'studies',
-  'routine',
+  'projects',
+  'rhythm',
   'ideas',
 ] as const;
 
 type PriorityId = (typeof priorityIds)[number];
+const homePreferences = ['day', 'inbox', 'projects', 'progress'] as const;
+type HomePreference = (typeof homePreferences)[number];
 
 @Injectable()
 export class ProfileService {
@@ -26,17 +28,23 @@ export class ProfileService {
 
   async completeOnboarding(id: string, input: CompleteOnboardingDto) {
     const name = this.validateName(input.name);
+    const currentFocus = this.validateCurrentFocus(input.currentFocus);
     const priorities = this.validatePriorities(input.priorities);
+    const homePreference = this.validateHomePreference(input.homePreference);
 
     return this.prisma.profile.upsert({
       create: {
         id,
         name,
+        currentFocus,
+        homePreference,
         onboardingCompletedAt: new Date(),
         priorities,
       },
       update: {
         name,
+        currentFocus,
+        homePreference,
         onboardingCompletedAt: new Date(),
         priorities,
       },
@@ -77,5 +85,28 @@ export class ProfileService {
     }
 
     return value as PriorityId[];
+  }
+
+  private validateCurrentFocus(value: unknown) {
+    if (typeof value !== 'string') {
+      throw new BadRequestException('Current focus must be a string.');
+    }
+
+    const currentFocus = value.trim();
+
+    if (!currentFocus || currentFocus.length > 140) {
+      throw new BadRequestException(
+        'Current focus must contain between 1 and 140 characters.',
+      );
+    }
+
+    return currentFocus;
+  }
+
+  private validateHomePreference(value: unknown): HomePreference {
+    if (typeof value !== 'string' || !homePreferences.includes(value as HomePreference)) {
+      throw new BadRequestException('Home preference is invalid.');
+    }
+    return value as HomePreference;
   }
 }

@@ -20,9 +20,9 @@ export default async function SetupPage() {
     redirect("/login");
   }
 
-  if (authenticatedProfile.destination === "/app") {
-    redirect("/app");
+  if (authenticatedProfile.destination === "/dashboard") {
+    redirect("/dashboard");
   }
 
-  return <OnboardingFlow />;
+  return <OnboardingFlow initialName={authenticatedProfile.suggestedName} />;
 }

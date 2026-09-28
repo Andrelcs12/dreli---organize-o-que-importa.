@@ -2,10 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
-export function SignOutButton() {
+export function SignOutButton({
+  className,
+  iconOnly = false,
+}: {
+  className?: string;
+  iconOnly?: boolean;
+}) {
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -28,8 +35,15 @@ export function SignOutButton() {
 
   return (
     <div>
-      <Button disabled={isSubmitting} onClick={handleSignOut} variant="outline">
-        {isSubmitting ? "Saindo..." : "Sair"}
+      <Button
+        aria-label={iconOnly ? "Sair da conta" : undefined}
+        className={className}
+        disabled={isSubmitting}
+        onClick={handleSignOut}
+        size={iconOnly ? "icon-sm" : "default"}
+        variant={iconOnly ? "destructive" : "ghost"}
+      >
+        {iconOnly ? <LogOut /> : isSubmitting ? "Saindo..." : "Sair"}
       </Button>
       {error ? (
         <p className="auth-error" role="alert">
