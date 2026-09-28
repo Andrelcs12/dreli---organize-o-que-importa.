@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Source_Serif_4 } from "next/font/google";
+import { BRAND_TAGLINE } from "@/common/brand";
 import { SplashScreen } from "@/common/components/splash-screen";
 import { ThemeProvider } from "@/common/components/theme-provider";
 import "./globals.css";
@@ -24,7 +25,7 @@ const siteUrl = new URL(
 );
 
 export const metadata: Metadata = {
-  title: { default: "Dreli — Own your rhythm", template: "%s | Dreli" },
+  title: { default: `Dreli — ${BRAND_TAGLINE}`, template: "%s | Dreli" },
   description:
     "Seu espaço pessoal para organizar informações, acompanhar prioridades e manter clareza sobre o que importa.",
   applicationName: "Dreli",
@@ -50,13 +51,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     siteName: "Dreli",
-    title: "Dreli — Own your rhythm",
+    title: `Dreli — ${BRAND_TAGLINE}`,
     description: "Menos abas abertas. Mais espaço na cabeça.",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dreli — Own your rhythm",
+    title: `Dreli — ${BRAND_TAGLINE}`,
     description: "Menos abas abertas. Mais espaço na cabeça.",
   },
   alternates: { canonical: "/" },

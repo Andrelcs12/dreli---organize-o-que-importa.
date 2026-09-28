@@ -5,9 +5,11 @@ import { getSupabaseEnvironment, isSupabaseConfigured } from "./env";
 const protectedPaths = [
   "/setup",
   "/dashboard",
+  "/links",
   "/inbox",
   "/library",
   "/favorites",
+  "/archived",
   "/app",
 ];
 const authPaths = ["/login", "/cadastro"];

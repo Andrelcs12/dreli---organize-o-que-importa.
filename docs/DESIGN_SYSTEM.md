@@ -2,6 +2,10 @@
 
 Para intenção do produto, consulte [PRODUCT.md](./PRODUCT.md). Este documento registra regras visuais estáveis, não correções pontuais de CSS.
 
+## Marca
+
+A tagline oficial e permanente é: “Seu ritmo, do seu jeito.”
+
 ## Direção
 
 Calmo, claro, pessoal e preciso. O Dreli é software com toque editorial controlado — não template SaaS, dashboard corporativo, produto de IA genérico ou revista de luxo.

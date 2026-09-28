@@ -14,6 +14,7 @@ export type SavedLink = {
 
 export type SavedLinksResponse = {
   counts: {
+    archived: number;
     favorites: number;
     inbox: number;
     library: number;

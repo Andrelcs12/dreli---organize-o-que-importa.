@@ -25,14 +25,19 @@ export default async function DashboardPage() {
   return (
     <ProductShell
       identity={authenticatedProfile.identity}
+      linkCounts={savedLinks.counts}
       profile={authenticatedProfile.profile}
       section="dashboard"
+      showSaveLinkShortcut={false}
+      subtitle={new Intl.DateTimeFormat("pt-BR", {
+        day: "numeric",
+        month: "long",
+        timeZone: "America/Fortaleza",
+        weekday: "long",
+      }).format(new Date())}
       title="Visão geral"
     >
-      <DashboardOverview
-        currentFocus={authenticatedProfile.profile.currentFocus}
-        savedLinks={savedLinks}
-      />
+      <DashboardOverview savedLinks={savedLinks} />
     </ProductShell>
   );
 }

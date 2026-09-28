@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { BRAND_TAGLINE } from "@/common/brand";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { AnimatedNumber } from "./animated-number";
@@ -86,7 +87,7 @@ export function LandingSections({
         <MotionReveal>
           <div className="shell">
             <BrandLogo href="/" tone="light" />
-            <p>Own your rhythm.</p>
+            <p>{BRAND_TAGLINE}</p>
             <h2>Seu ritmo, em um só lugar.</h2>
             <p className="closing-copy">
               Guarde o que importa, organize o que vem agora e continue sem

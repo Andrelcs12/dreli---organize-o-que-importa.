@@ -1,6 +1,6 @@
 # Dreli — Produto
 
-> Own your rhythm.
+> Seu ritmo, do seu jeito.
 
 Para estado de execução, consulte [ROADMAP.md](./ROADMAP.md). Decisões técnicas pertencem a [ARCHITECTURE.md](./ARCHITECTURE.md).
 

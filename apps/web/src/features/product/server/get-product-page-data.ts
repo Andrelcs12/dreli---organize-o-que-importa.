@@ -2,7 +2,7 @@ import { getAuthenticatedProfile } from "@/features/auth/server/authenticated-pr
 import { getSavedLinks } from "@/features/saved-links/server/get-saved-links";
 
 export async function getProductPageData(
-  view: "dashboard" | "inbox" | "library" | "favorites",
+  view: "dashboard" | "links" | "inbox" | "library" | "favorites" | "archived",
 ) {
   const authenticatedProfile = await getAuthenticatedProfile();
 

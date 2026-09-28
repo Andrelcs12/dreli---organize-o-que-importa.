@@ -1,16 +1,19 @@
-import type { ReactNode } from "react";
 import {
   Archive,
+  ArchiveX,
   Inbox,
   LayoutDashboard,
   Link2,
   Star,
 } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { ThemeToggle } from "@/common/components/theme-toggle";
-import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import { QuickMenu } from "@/features/product/components/quick-menu";
+import { SaveLinkShortcut } from "@/features/saved-links/components/save-link-shortcut";
+import { SavedLinkCount } from "@/features/saved-links/components/saved-link-counts";
 
 type ProductProfile = {
   name: string | null;
@@ -21,13 +24,26 @@ type ProductIdentity = {
   email: string | null;
 };
 
-type ProductSection = "dashboard" | "inbox" | "library" | "favorites";
+type ProductSection =
+  | "dashboard"
+  | "links"
+  | "inbox"
+  | "library"
+  | "favorites"
+  | "archived";
+type LinkCounts = {
+  archived: number;
+  favorites: number;
+  inbox: number;
+  library: number;
+};
 
 const navigation: {
   href: string;
   icon: typeof LayoutDashboard;
   label: string;
   section: ProductSection;
+  count?: keyof LinkCounts;
 }[] = [
   {
     href: "/dashboard",
@@ -35,9 +51,35 @@ const navigation: {
     label: "Visão geral",
     section: "dashboard",
   },
-  { href: "/inbox", icon: Inbox, label: "Inbox", section: "inbox" },
-  { href: "/library", icon: Archive, label: "Biblioteca", section: "library" },
-  { href: "/favorites", icon: Star, label: "Favoritos", section: "favorites" },
+  { href: "/links", icon: Link2, label: "Links", section: "links" },
+  {
+    href: "/inbox",
+    icon: Inbox,
+    label: "Inbox",
+    section: "inbox",
+    count: "inbox",
+  },
+  {
+    href: "/library",
+    icon: Archive,
+    label: "Biblioteca",
+    section: "library",
+    count: "library",
+  },
+  {
+    href: "/favorites",
+    icon: Star,
+    label: "Favoritos",
+    section: "favorites",
+    count: "favorites",
+  },
+  {
+    href: "/archived",
+    icon: ArchiveX,
+    label: "Arquivados",
+    section: "archived",
+    count: "archived",
+  },
 ];
 
 function getInitials(name: string | null, email: string | null) {
@@ -49,14 +91,20 @@ function getInitials(name: string | null, email: string | null) {
 export function ProductShell({
   children,
   identity,
+  linkCounts,
   profile,
   section,
+  showSaveLinkShortcut = true,
+  subtitle,
   title,
 }: {
   children: ReactNode;
   identity: ProductIdentity;
+  linkCounts: LinkCounts;
   profile: ProductProfile;
   section: ProductSection;
+  showSaveLinkShortcut?: boolean;
+  subtitle?: string;
   title: string;
 }) {
   const firstName = profile.name?.trim().split(/\s+/)[0] ?? "você";
@@ -67,13 +115,7 @@ export function ProductShell({
       <aside className="product-sidebar" aria-label="Navegação do produto">
         <div className="product-sidebar-top">
           <BrandLogo href="/dashboard" />
-          <Button asChild className="product-save-link" size="sm">
-            <Link href="/dashboard#salvar-link">
-              <Link2 aria-hidden="true" /> Salvar link
-            </Link>
-          </Button>
           <nav aria-label="Áreas do Dreli">
-            <p className="product-nav-label">Seu espaço</p>
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = item.section === section;
@@ -89,6 +131,9 @@ export function ProductShell({
                 >
                   <Icon aria-hidden="true" />
                   <span>{item.label}</span>
+                  {item.count ? (
+                    <SavedLinkCount count={item.count} counts={linkCounts} />
+                  ) : null}
                   {isActive ? (
                     <i aria-hidden="true" className="product-nav-active-dot" />
                   ) : null}
@@ -98,8 +143,8 @@ export function ProductShell({
           </nav>
         </div>
 
-        <div className="product-sidebar-account">
-          <div className="product-account-identity">
+        <details className="product-sidebar-account">
+          <summary className="product-account-identity">
             <span className="product-avatar" aria-hidden="true">
               {identity.avatarUrl ? (
                 // biome-ignore lint/performance/noImgElement: avatar_url vem de hosts externos do Supabase/Google e não há host fixo para next/image.
@@ -112,18 +157,26 @@ export function ProductShell({
               <strong>{profile.name ?? "Seu espaço"}</strong>
               <small>{identity.email ?? "Conta Dreli"}</small>
             </span>
+          </summary>
+          <div className="product-account-menu">
+            <SignOutButton destructive />
           </div>
-          <SignOutButton className="product-account-signout" iconOnly />
-        </div>
+        </details>
       </aside>
 
       <section className="product-main">
         <header className="product-header">
           <div>
-            <p>Seu espaço</p>
             <h1>{title === "Visão geral" ? `Olá, ${firstName}.` : title}</h1>
+            {subtitle ? (
+              <p className="product-header-subtitle">{subtitle}</p>
+            ) : null}
           </div>
-          <ThemeToggle />
+          <div className="product-header-actions">
+            <QuickMenu />
+            <ThemeToggle />
+            {showSaveLinkShortcut ? <SaveLinkShortcut /> : null}
+          </div>
         </header>
         {children}
       </section>

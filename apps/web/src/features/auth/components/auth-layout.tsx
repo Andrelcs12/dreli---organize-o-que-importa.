@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { BRAND_TAGLINE } from "@/common/brand";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { ThemeToggle } from "@/common/components/theme-toggle";
 
@@ -34,9 +35,9 @@ export function AuthLayout({
           {children}
         </motion.div>
       </section>
-      <aside className="auth-visual" aria-label="Dreli, Own your rhythm">
+      <aside className="auth-visual" aria-label={`Dreli, ${BRAND_TAGLINE}`}>
         <div className="auth-visual-text">
-          <span>Own your rhythm.</span>
+          <span>{BRAND_TAGLINE}</span>
           <p>{message}</p>
         </div>
         <div className="auth-orbit auth-orbit-one" />

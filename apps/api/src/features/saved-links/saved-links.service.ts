@@ -9,7 +9,7 @@ import {
 import { PrismaService } from '../../common/database/prisma.service.js';
 import type { CreateSavedLinkDto, UpdateSavedLinkDto } from './dto/saved-link.dto.js';
 
-const views = ['dashboard', 'inbox', 'library', 'favorites'] as const;
+const views = ['dashboard', 'links', 'inbox', 'library', 'favorites', 'archived'] as const;
 const statuses = ['INBOX', 'LIBRARY', 'ARCHIVED'] as const;
 const metadataLimit = 250_000;
 const metadataTimeout = 4_500;
@@ -31,20 +31,20 @@ export class SavedLinksService {
   async list(profileId: string, view?: string) {
     const selectedView = this.validateView(view);
     const where = this.getViewWhere(profileId, selectedView);
-    const [items, inbox, library, favorites] = await Promise.all([
+    const [items, inbox, library, favorites, archived] = await Promise.all([
       this.prisma.savedLink.findMany({
         where,
         orderBy: { createdAt: 'desc' },
-        take: selectedView === 'dashboard' ? 6 : 50,
       }),
       this.prisma.savedLink.count({ where: { profileId, status: 'INBOX' } }),
       this.prisma.savedLink.count({ where: { profileId, status: 'LIBRARY' } }),
       this.prisma.savedLink.count({
         where: { profileId, isFavorite: true, status: { not: 'ARCHIVED' } },
       }),
+      this.prisma.savedLink.count({ where: { profileId, status: 'ARCHIVED' } }),
     ]);
 
-    return { counts: { favorites, inbox, library }, items };
+    return { counts: { archived, favorites, inbox, library }, items };
   }
 
   async create(profileId: string, input: CreateSavedLinkDto) {
@@ -112,11 +112,13 @@ export class SavedLinksService {
   }
 
   private getViewWhere(profileId: string, view: SavedLinkView) {
+    if (view === 'dashboard') return { profileId };
     if (view === 'inbox') return { profileId, status: 'INBOX' as const };
     if (view === 'library') return { profileId, status: 'LIBRARY' as const };
     if (view === 'favorites') {
       return { profileId, isFavorite: true, status: { not: 'ARCHIVED' as const } };
     }
+    if (view === 'archived') return { profileId, status: 'ARCHIVED' as const };
     return { profileId, status: { not: 'ARCHIVED' as const } };
   }
 

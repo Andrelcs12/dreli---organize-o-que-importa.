@@ -3,14 +3,16 @@ import { createClient } from "@/lib/supabase/server";
 import type { SavedLinksResponse } from "../types";
 
 export async function getSavedLinks(
-  view: "dashboard" | "inbox" | "library" | "favorites",
+  view: "dashboard" | "links" | "inbox" | "library" | "favorites" | "archived",
 ) {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session?.access_token) return null;
+  if (!session?.access_token) {
+    throw new Error("Sessão autenticada não encontrada.");
+  }
 
   const response = await fetch(`${getApiUrl()}/saved-links?view=${view}`, {
     cache: "no-store",

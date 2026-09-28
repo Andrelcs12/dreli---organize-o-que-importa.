@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
+import { BRAND_TAGLINE } from "@/common/brand";
 
-export const alt = "Dreli — Own your rhythm";
+export const alt = `Dreli — ${BRAND_TAGLINE}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -44,8 +45,15 @@ export default function OpenGraphImage() {
         dreli
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <div style={{ color: "#53705b", fontSize: 22, letterSpacing: 3 }}>
-          OWN YOUR RHYTHM
+        <div
+          style={{
+            color: "#53705b",
+            fontSize: 22,
+            letterSpacing: 3,
+            textTransform: "uppercase",
+          }}
+        >
+          {BRAND_TAGLINE}
         </div>
         <div
           style={{

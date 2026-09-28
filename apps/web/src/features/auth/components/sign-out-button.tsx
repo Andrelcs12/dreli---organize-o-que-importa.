@@ -1,16 +1,18 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
 export function SignOutButton({
   className,
+  destructive = false,
   iconOnly = false,
 }: {
   className?: string;
+  destructive?: boolean;
   iconOnly?: boolean;
 }) {
   const [error, setError] = useState<string>();
@@ -41,7 +43,7 @@ export function SignOutButton({
         disabled={isSubmitting}
         onClick={handleSignOut}
         size={iconOnly ? "icon-sm" : "default"}
-        variant={iconOnly ? "destructive" : "ghost"}
+        variant={destructive || iconOnly ? "destructive" : "ghost"}
       >
         {iconOnly ? <LogOut /> : isSubmitting ? "Saindo..." : "Sair"}
       </Button>

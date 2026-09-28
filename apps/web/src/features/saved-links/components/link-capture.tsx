@@ -1,17 +1,30 @@
 "use client";
 
 import { Link2, LoaderCircle, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSavedLink } from "../service/saved-links-client";
+import { dispatchSavedLinkChange } from "../service/saved-links-events";
+import type { SavedLink } from "../types";
 
-export function LinkCapture() {
+export function LinkCapture({
+  inputId = "saved-link-url",
+  onSaved,
+}: {
+  inputId?: string;
+  onSaved?: (link: SavedLink) => void;
+}) {
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [url, setUrl] = useState("");
-  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const focus = () => inputRef.current?.focus();
+    window.addEventListener("dreli:focus-link-capture", focus);
+    return () => window.removeEventListener("dreli:focus-link-capture", focus);
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -19,9 +32,13 @@ export function LinkCapture() {
     setIsSubmitting(true);
 
     try {
-      await createSavedLink(url);
+      const link = await createSavedLink(url);
       setUrl("");
-      router.refresh();
+      onSaved?.(link);
+      dispatchSavedLinkChange({ current: link, previous: null });
+      window.dispatchEvent(
+        new CustomEvent("dreli:saved-link", { detail: link }),
+      );
     } catch (submissionError) {
       setError(
         submissionError instanceof Error
@@ -39,21 +56,26 @@ export function LinkCapture() {
         <Link2 />
       </div>
       <div className="link-capture-field">
-        <label htmlFor="saved-link-url">Guarde um link</label>
+        <label htmlFor={inputId}>Guarde um link</label>
         <Input
-          aria-describedby={error ? "saved-link-error" : undefined}
+          aria-describedby={error ? `${inputId}-error` : undefined}
           aria-invalid={Boolean(error)}
           autoComplete="url"
-          id="saved-link-url"
+          id={inputId}
           inputMode="url"
           onChange={(event) => setUrl(event.target.value)}
           placeholder="https://algo-que-você-quer-lembrar.com"
           required
+          ref={inputRef}
           type="url"
           value={url}
         />
         {error ? (
-          <p className="link-capture-error" id="saved-link-error" role="alert">
+          <p
+            className="link-capture-error"
+            id={`${inputId}-error`}
+            role="alert"
+          >
             {error}
           </p>
         ) : null}

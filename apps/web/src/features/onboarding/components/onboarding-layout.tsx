@@ -1,5 +1,6 @@
 "use client";
 
+import { BRAND_TAGLINE } from "@/common/brand";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { ThemeToggle } from "@/common/components/theme-toggle";
 
@@ -40,7 +41,7 @@ export function OnboardingLayout({ children, step }: OnboardingLayoutProps) {
           <h1>{detail.label}</h1>
           <p>{detail.text}</p>
         </div>
-        <span className="setup-aside-signature">Own your rhythm.</span>
+        <span className="setup-aside-signature">{BRAND_TAGLINE}</span>
       </aside>
       <section className="setup-content">{children}</section>
     </main>

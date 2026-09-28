@@ -1,17 +1,32 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 import { useEffect, useLayoutEffect, useState } from "react";
+import { BRAND_TAGLINE } from "@/common/brand";
 
 const sessionKey = "dreli:splash-seen";
-const exitDelay = 2200;
-const developmentPreviewDelay = 4200;
+const exitDelay = 2000;
+const developmentPreviewDelay = 2500;
+const ease = [0.22, 1, 0.36, 1] as const;
 
-const strokeVariants = [
-  { className: "splash-reveal-mask-top", delay: 0.2 },
-  { className: "splash-reveal-mask-middle", delay: 0.31 },
-  { className: "splash-reveal-mask-bottom", delay: 0.42 },
+// Três faixas da logo como paths separados (traçadas a partir da PNG).
+// Para precisão total, troque os "d" pelo SVG exportado do Figma.
+const stripes = [
+  {
+    id: "top",
+    delay: 0.15,
+    d: "M110 222H640C850 222 1000 390 1000 580C1000 650 985 715 958 745Q948 756 935 752C890 745 850 710 834 672Q832 668 835 662C842 640 846 620 846 598C846 480 750 380 640 380H180C135 380 98 345 98 300V235Q98 222 110 222Z",
+  },
+  {
+    id: "middle",
+    delay: 0.3,
+    d: "M110 460H470C570 460 640 510 700 580C760 650 800 730 850 760C880 780 910 786 930 786Q940 788 934 796C915 818 890 826 860 826C790 826 720 740 660 690C590 630 520 608 430 608H290C180 608 98 560 98 480Q98 460 110 460Z",
+  },
+  {
+    id: "bottom",
+    delay: 0.45,
+    d: "M112 665H340C460 665 550 730 622 838H290C190 838 110 770 100 680Q100 665 112 665Z",
+  },
 ];
 
 export function SplashScreen() {
@@ -51,43 +66,52 @@ export function SplashScreen() {
       onAnimationComplete={() => {
         if (leaving) setVisible(false);
       }}
-      transition={{
-        duration: reduceMotion ? 0.12 : 0.38,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      transition={{ duration: reduceMotion ? 0.12 : 0.4, ease }}
     >
       <motion.div
-        animate={leaving ? { opacity: 0, y: -5 } : { opacity: 1, y: 0 }}
+        animate={
+          leaving ? { opacity: 0, y: -6, scale: 0.98 } : { opacity: 1, y: 0 }
+        }
         className="splash-brand"
         initial={false}
-        transition={{
-          duration: reduceMotion ? 0.01 : leaving ? 0.28 : 0,
-          ease: [0.22, 1, 0.36, 1],
-        }}
+        transition={{ duration: leaving ? 0.3 : 0, ease }}
       >
         <div aria-hidden="true" className="splash-symbol">
-          <Image alt="" fill priority sizes="132px" src="/icon.png" />
-          {!reduceMotion &&
-            strokeVariants.map(({ className, delay }) => (
-              <motion.div
-                animate={{ clipPath: "inset(0 0 0 100%)", opacity: 0 }}
-                className={`splash-reveal-mask ${className}`}
-                initial={{ clipPath: "inset(0 0 0 0)", opacity: 1 }}
-                key={className}
-                transition={{ duration: 0.42, delay, ease: [0.22, 1, 0.36, 1] }}
-              />
-            ))}
+          <svg
+            aria-hidden="true"
+            style={{ width: "100%", height: "100%", overflow: "visible" }}
+            viewBox="90 215 920 640"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <motion.g
+              animate={{ scale: 1 }}
+              initial={reduceMotion ? false : { scale: 0.94 }}
+              style={{ transformBox: "fill-box", transformOrigin: "center" }}
+              transition={{ duration: 1.1, delay: 0.1, ease }}
+            >
+              {stripes.map(({ id, d, delay }) => (
+                <motion.path
+                  animate={{ clipPath: "inset(0 0% 0 0)", x: 0, opacity: 1 }}
+                  d={d}
+                  fill="currentColor"
+                  initial={
+                    reduceMotion
+                      ? false
+                      : { clipPath: "inset(0 100% 0 0)", x: -60, opacity: 0 }
+                  }
+                  key={id}
+                  transition={{ duration: 0.7, delay, ease }}
+                />
+              ))}
+            </motion.g>
+          </svg>
         </div>
 
         <motion.span
           animate={{ opacity: 1, x: 0 }}
           className="splash-wordmark"
-          initial={reduceMotion ? false : { opacity: 0, x: -8 }}
-          transition={{
-            duration: 0.35,
-            delay: reduceMotion ? 0 : 1.2,
-            ease: [0.22, 1, 0.36, 1],
-          }}
+          initial={reduceMotion ? false : { opacity: 0, x: -18 }}
+          transition={{ duration: 0.5, delay: reduceMotion ? 0 : 1.05, ease }}
         >
           Dreli
         </motion.span>
@@ -96,13 +120,9 @@ export function SplashScreen() {
           animate={{ opacity: 0.65, y: 0 }}
           className="splash-tagline"
           initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-          transition={{
-            duration: 0.32,
-            delay: reduceMotion ? 0 : 1.55,
-            ease: [0.22, 1, 0.36, 1],
-          }}
+          transition={{ duration: 0.4, delay: reduceMotion ? 0 : 1.45, ease }}
         >
-          Own your rhythm.
+          {BRAND_TAGLINE}
         </motion.span>
       </motion.div>
     </motion.div>

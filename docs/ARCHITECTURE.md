@@ -22,6 +22,8 @@ src/app/
 ├── (auth)/cadastro/page.tsx        → /cadastro
 ├── (onboarding)/setup/page.tsx     → /setup
 ├── (product)/dashboard/page.tsx    → /dashboard
+├── (product)/links/page.tsx        → /links
+├── (product)/archived/page.tsx     → /archived
 ├── (product)/app/page.tsx          → /app (redirect compatível)
 └── auth/callback/route.ts          → /auth/callback
 ```
@@ -104,4 +106,4 @@ Em desenvolvimento, a API escuta `4000` por padrão. Arquivos `.env` não são v
 
 - Google OAuth foi testado manualmente; toda nova origem/ambiente ainda precisa da configuração correspondente no Google Cloud e no Supabase.
 - O setup possui três etapas e reutiliza `Profile.name` ou metadata do Supabase; nome manual é apenas fallback.
-- `/dashboard` possui shell protegido com dados reais do Profile e identidade de exibição do Supabase. `/app` redireciona para ele. Links, Inbox, Library, Tasks e demais verticais ainda não existem.
+- `/dashboard` é a home protegida, com resumo das coleções, links recentes e ritmo derivado exclusivamente de `SavedLink.createdAt`. A visão `dashboard` de Saved Links inclui também itens arquivados para que a constância represente todos os links salvos; `/links` concentra captura, filtros e a lista completa; `/app` redireciona para `/dashboard`.

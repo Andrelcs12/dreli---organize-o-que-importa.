@@ -18,6 +18,7 @@ export default async function FavoritesPage() {
   return (
     <ProductShell
       identity={pageData.authenticatedProfile.identity}
+      linkCounts={pageData.savedLinks.counts}
       profile={pageData.authenticatedProfile.profile}
       section="favorites"
       title="Favoritos"

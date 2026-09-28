@@ -8,7 +8,6 @@ import {
   Globe2,
   Heart,
   LoaderCircle,
-  Star,
   Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,9 +17,23 @@ import {
   deleteSavedLink,
   updateSavedLink,
 } from "../service/saved-links-client";
+import { dispatchSavedLinkChange } from "../service/saved-links-events";
 import type { SavedLink } from "../types";
 
 function formatDate(value: string) {
+  const elapsedSeconds = Math.max(
+    0,
+    Math.floor((Date.now() - new Date(value).getTime()) / 1_000),
+  );
+
+  if (elapsedSeconds < 60) return "agora";
+  if (elapsedSeconds < 3_600)
+    return `há ${Math.floor(elapsedSeconds / 60)} min`;
+  if (elapsedSeconds < 86_400)
+    return `há ${Math.floor(elapsedSeconds / 3_600)}h`;
+  if (elapsedSeconds < 604_800)
+    return `há ${Math.floor(elapsedSeconds / 86_400)}d`;
+
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "short",
@@ -38,9 +51,11 @@ function getFaviconUrl(url: string) {
 export function SavedLinksList({
   emptyCopy,
   items,
+  onChange,
 }: {
   emptyCopy: string;
   items: SavedLink[];
+  onChange?: (link: SavedLink | null, deletedId?: string) => void;
 }) {
   if (!items.length) {
     return <p className="saved-links-empty">{emptyCopy}</p>;
@@ -49,25 +64,37 @@ export function SavedLinksList({
   return (
     <div className="saved-links-list">
       {items.map((link) => (
-        <SavedLinkRow key={link.id} link={link} />
+        <SavedLinkRow key={link.id} link={link} onChange={onChange} />
       ))}
     </div>
   );
 }
 
-function SavedLinkRow({ link }: { link: SavedLink }) {
+function SavedLinkRow({
+  link,
+  onChange,
+}: {
+  link: SavedLink;
+  onChange?: (link: SavedLink | null, deletedId?: string) => void;
+}) {
   const [error, setError] = useState<string>();
   const [isUpdating, setIsUpdating] = useState(false);
   const [faviconVisible, setFaviconVisible] = useState(true);
   const router = useRouter();
   const faviconUrl = getFaviconUrl(link.url);
 
-  async function run(action: () => Promise<unknown>) {
+  async function run(action: () => Promise<SavedLink | { id: string }>) {
     setError(undefined);
     setIsUpdating(true);
     try {
-      await action();
-      router.refresh();
+      const result = await action();
+      const current = "url" in result ? result : null;
+      dispatchSavedLinkChange({ current, previous: link });
+      if (onChange) {
+        onChange(current, current ? undefined : result.id);
+      } else {
+        router.refresh();
+      }
     } catch (actionError) {
       setError(
         actionError instanceof Error
@@ -80,6 +107,7 @@ function SavedLinkRow({ link }: { link: SavedLink }) {
   }
 
   const title = link.title || link.domain;
+  const isArchived = link.status === "ARCHIVED";
 
   return (
     <article className="saved-link-row">
@@ -104,18 +132,13 @@ function SavedLinkRow({ link }: { link: SavedLink }) {
           <i aria-hidden="true" />
           <time dateTime={link.createdAt}>{formatDate(link.createdAt)}</time>
         </p>
-        {link.description ? <small>{link.description}</small> : null}
         {error ? (
           <span className="saved-link-error" role="alert">
             {error}
           </span>
         ) : null}
       </div>
-      <div
-        aria-label={`Ações para ${title}`}
-        className="saved-link-actions"
-        role="group"
-      >
+      <div className="saved-link-actions">
         <Button
           aria-label={link.isFavorite ? "Remover dos favoritos" : "Favoritar"}
           disabled={isUpdating}
@@ -132,44 +155,63 @@ function SavedLinkRow({ link }: { link: SavedLink }) {
         </Button>
         <Button
           aria-label={
-            link.status === "LIBRARY"
-              ? "Mover para Inbox"
-              : "Guardar na Biblioteca"
+            isArchived
+              ? "Restaurar para Inbox"
+              : link.status === "LIBRARY"
+                ? "Mover para Inbox"
+                : "Guardar na Biblioteca"
           }
           disabled={isUpdating}
           onClick={() =>
             run(() =>
               updateSavedLink(link.id, {
-                status: link.status === "LIBRARY" ? "INBOX" : "LIBRARY",
+                status:
+                  link.status === "LIBRARY" || isArchived ? "INBOX" : "LIBRARY",
               }),
             )
           }
           size="icon-xs"
           title={
-            link.status === "LIBRARY"
-              ? "Mover para Inbox"
-              : "Guardar na Biblioteca"
+            isArchived
+              ? "Restaurar para Inbox"
+              : link.status === "LIBRARY"
+                ? "Mover para Inbox"
+                : "Guardar na Biblioteca"
           }
           variant="ghost"
         >
-          {link.status === "LIBRARY" ? <ArchiveRestore /> : <Archive />}
+          {link.status === "LIBRARY" || isArchived ? (
+            <ArchiveRestore />
+          ) : (
+            <Archive />
+          )}
         </Button>
-        <Button
-          aria-label="Arquivar"
-          disabled={isUpdating}
-          onClick={() =>
-            run(() => updateSavedLink(link.id, { status: "ARCHIVED" }))
-          }
-          size="icon-xs"
-          title="Arquivar"
-          variant="ghost"
-        >
-          <ArchiveX />
-        </Button>
+        {!isArchived ? (
+          <Button
+            aria-label="Arquivar"
+            disabled={isUpdating}
+            onClick={() =>
+              run(() => updateSavedLink(link.id, { status: "ARCHIVED" }))
+            }
+            size="icon-xs"
+            title="Arquivar"
+            variant="ghost"
+          >
+            <ArchiveX />
+          </Button>
+        ) : null}
         <Button
           aria-label="Excluir link"
           disabled={isUpdating}
-          onClick={() => run(() => deleteSavedLink(link.id))}
+          onClick={() => {
+            if (
+              window.confirm(
+                "Excluir este link? Essa ação não poderá ser desfeita.",
+              )
+            ) {
+              void run(() => deleteSavedLink(link.id));
+            }
+          }}
           size="icon-xs"
           title="Excluir link"
           variant="ghost"
