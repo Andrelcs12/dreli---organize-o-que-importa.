@@ -2762,25 +2762,35 @@ h2 {
   outline-offset: 2px;
 }
 .dreli-tour-popover.driver-popover {
-  width: min(340px, calc(100vw - 28px));
-  padding: 16px;
+  width: min(332px, calc(100vw - 28px));
+  padding: 15px 16px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--card);
   color: var(--foreground);
-  box-shadow: 0 14px 34px rgb(0 0 0 / 18%);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 16%);
+}
+.dreli-tour-kicker {
+  margin: 0 0 7px;
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 .dreli-tour-popover .driver-popover-title {
-  margin: 0 24px 6px 0;
+  margin: 0 26px 6px 0;
   color: var(--foreground);
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 750;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 .dreli-tour-popover .driver-popover-description {
   color: var(--muted-foreground);
   font-size: 12px;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 .dreli-tour-popover .driver-popover-arrow {
   border-color: var(--card);
@@ -2788,7 +2798,7 @@ h2 {
 .dreli-tour-popover .driver-popover-footer {
   align-items: center;
   gap: 8px;
-  margin-top: 15px;
+  margin-top: 14px;
 }
 .dreli-tour-popover .driver-popover-progress-text {
   color: var(--muted-foreground);
@@ -2801,8 +2811,8 @@ h2 {
 }
 .dreli-tour-popover .driver-popover-footer button,
 .dreli-tour-skip {
-  min-height: 29px;
-  padding: 0 9px;
+  min-height: 30px;
+  padding: 0 10px;
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -2816,6 +2826,15 @@ h2 {
 .dreli-tour-popover .driver-popover-next-btn {
   background: var(--primary);
   color: var(--primary-foreground);
+}
+.dreli-tour-popover .driver-popover-next-btn:hover {
+  background: var(--teal);
+  color: var(--primary-foreground);
+}
+.dreli-tour-popover .driver-popover-footer button:focus-visible,
+.dreli-tour-skip:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }
 .dreli-tour-popover .driver-popover-prev-btn:hover,
 .dreli-tour-skip:hover {

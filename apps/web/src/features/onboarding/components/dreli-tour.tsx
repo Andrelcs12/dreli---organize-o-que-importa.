@@ -17,33 +17,37 @@ function steps(): DriveStep[] {
       popover: {
         align: "center",
         description:
-          "A Visão geral reúne o que merece sua atenção e mostra como seu ritmo está evoluindo.",
+          "A Visão geral reúne o que pede atenção e acompanha seu ritmo, sem transformar seu dia em um painel.",
+        nextBtnText: "Ver os atalhos",
         side: "bottom",
-        title: "Este é o seu espaço.",
+        title: "Seu espaço, do seu jeito.",
       },
     },
     {
       element: "[data-tour='summary-cards']",
       popover: {
         description:
-          "Inbox, Biblioteca, Favoritos e Ritmo mostram rapidamente o que está acontecendo no seu Dreli.",
-        title: "Seu estado em poucos segundos.",
+          "Em um olhar: o que organizar, guardar, revisitar e o ritmo que você está criando.",
+        nextBtnText: "Ver as abas",
+        title: "Seu estado, sem ruído.",
       },
     },
     {
       element: "[data-tour='dashboard-tabs']",
       popover: {
         description:
-          "Alterne entre seus links, seu ritmo e o que aconteceu recentemente sem sair desta página.",
-        title: "Explore sua Visão geral.",
+          "Aqui você muda de perspectiva. A sidebar leva a áreas; estas abas aprofundam a Visão geral.",
+        nextBtnText: "Ver onde salvar",
+        title: "Uma visão, vários recortes.",
       },
     },
     {
       element: "[data-tour='link-capture']",
       popover: {
         description:
-          "Cole um link e salve. Novos links entram na Inbox para você organizar depois.",
-        title: "Jogue aqui primeiro.",
+          "Cole um link e siga. Ele entra na Inbox até você decidir onde deve ficar.",
+        nextBtnText: "Ver organização",
+        title: "Guarde antes de esquecer.",
       },
     },
     {
@@ -51,31 +55,25 @@ function steps(): DriveStep[] {
       onHighlightStarted: openLinksNavigation,
       popover: {
         description:
-          "Inbox recebe o que ainda precisa de decisão. Biblioteca mantém referências, Favoritos deixa o importante por perto e Arquivados tira itens da frente sem apagá-los.",
-        title: "Organize o que você guarda.",
+          "Inbox é a entrada. Biblioteca guarda referências, Favoritos aproxima o importante e Arquivados limpa sem apagar.",
+        nextBtnText: "Ver contexto",
+        title: "Tudo tem um lugar.",
       },
     },
     {
       element: "[data-tour='sidebar-context']",
       popover: {
         description:
-          "Clima e Notícias trazem informações úteis sem transformar o Dreli em um feed infinito.",
-        title: "Contexto para o seu dia.",
-      },
-    },
-    {
-      element: "[data-tour='sidebar-insights']",
-      popover: {
-        description:
-          "Histórico mostra o que aconteceu, Relatórios resumem períodos e Ritmo ajuda você a perceber sua constância.",
-        title: "Enxergue seu ritmo.",
+          "Clima e Notícias trazem contexto. Histórico, Relatórios e Ritmo mostram o que mudou com o tempo.",
+        nextBtnText: "Ver minha conta",
+        title: "Contexto, não distração.",
       },
     },
     {
       element: "[data-tour='account']",
       popover: {
         description: "Abra este menu para acessar seu perfil e sair da conta.",
-        title: "Sua conta fica aqui.",
+        title: "Você decide o próximo passo.",
       },
     },
   ];
@@ -117,8 +115,15 @@ export function DreliTour({ profileId }: { profileId: string }) {
         stagePadding: 8,
         stageRadius: 8,
         steps: tourSteps,
-        onPopoverRender: (popover) => {
+        onPopoverRender: (popover, options) => {
           popover.closeButton.setAttribute("aria-label", "Pular tutorial");
+          popover.previousButton.setAttribute("aria-label", "Voltar uma etapa");
+          popover.nextButton.setAttribute("aria-label", "Avançar no tutorial");
+          popover.wrapper.dataset.step = String((options.index ?? 0) + 1);
+          const label = document.createElement("p");
+          label.className = "dreli-tour-kicker";
+          label.textContent = "Dreli · guia rápido";
+          popover.title.before(label);
           const skip = document.createElement("button");
           skip.className = "dreli-tour-skip";
           skip.textContent = "Pular";
