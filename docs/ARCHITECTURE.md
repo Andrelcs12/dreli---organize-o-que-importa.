@@ -24,6 +24,12 @@ src/app/
 ├── (product)/dashboard/page.tsx    → /dashboard
 ├── (product)/links/page.tsx        → /links
 ├── (product)/archived/page.tsx     → /archived
+├── (product)/weather/page.tsx      → /weather
+├── (product)/news/page.tsx         → /news
+├── (product)/history/page.tsx      → /history
+├── (product)/reports/page.tsx      → /reports
+├── (product)/performance/page.tsx  → /performance
+├── (product)/profile/page.tsx      → /profile
 ├── (product)/app/page.tsx          → /app (redirect compatível)
 └── auth/callback/route.ts          → /auth/callback
 ```
@@ -107,3 +113,5 @@ Em desenvolvimento, a API escuta `4000` por padrão. Arquivos `.env` não são v
 - Google OAuth foi testado manualmente; toda nova origem/ambiente ainda precisa da configuração correspondente no Google Cloud e no Supabase.
 - O setup possui três etapas e reutiliza `Profile.name` ou metadata do Supabase; nome manual é apenas fallback.
 - `/dashboard` é a home protegida, com resumo das coleções, links recentes e ritmo derivado exclusivamente de `SavedLink.createdAt`. A visão `dashboard` de Saved Links inclui também itens arquivados para que a constância represente todos os links salvos; `/links` concentra captura, filtros e a lista completa; `/app` redireciona para `/dashboard`.
+- `/weather` pede geolocalização do browser somente após consentimento e consulta Open-Meteo diretamente, sem chave. `/news` consulta GDELT por uma Route Handler interna, sem armazenar artigos. Histórico, Relatórios e Desempenho derivam somente de dados e timestamps de `SavedLink`; não existe event log ou score de produtividade.
+- O tour inicial usa Driver.js no cliente e persiste a conclusão em `localStorage` por `Profile.id` (`dreli:onboarding:<profileId>:completed`). Ele não altera o onboarding autenticado nem exige migration; pode ser reaberto em Perfil.

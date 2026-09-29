@@ -1,6 +1,13 @@
 "use client";
 
-import { Archive, Inbox, Link2, Star, TrendingUp } from "lucide-react";
+import {
+  Archive,
+  ArrowUpRight,
+  Inbox,
+  Link2,
+  Star,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SavedLinkChange } from "../service/saved-links-events";
@@ -218,37 +225,53 @@ export function DashboardOverview({
       <section
         className="dashboard-summary-cards"
         aria-label="Resumo dos seus links"
+        data-tour="summary-cards"
       >
         <Link href="/inbox">
-          <Inbox aria-hidden="true" />
-          <span>Inbox</span>
-          <strong>{counts.inbox}</strong>
-          <small>Aguardando organização</small>
+          <span className="dashboard-summary-card-heading">
+            <span>
+              <Inbox aria-hidden="true" /> Inbox
+            </span>
+            <ArrowUpRight aria-hidden="true" />
+          </span>
+          <strong>{counts.inbox} para organizar</strong>
+          <small>Links aguardando uma decisão</small>
         </Link>
         <Link href="/library">
-          <Archive aria-hidden="true" />
-          <span>Biblioteca</span>
-          <strong>{counts.library}</strong>
-          <small>Referências guardadas</small>
+          <span className="dashboard-summary-card-heading">
+            <span>
+              <Archive aria-hidden="true" /> Biblioteca
+            </span>
+            <ArrowUpRight aria-hidden="true" />
+          </span>
+          <strong>{counts.library} referências</strong>
+          <small>O que você decidiu manter</small>
         </Link>
         <Link href="/favorites">
-          <Star aria-hidden="true" />
-          <span>Favoritos</span>
-          <strong>{counts.favorites}</strong>
-          <small>Itens importantes</small>
+          <span className="dashboard-summary-card-heading">
+            <span>
+              <Star aria-hidden="true" /> Favoritos
+            </span>
+            <ArrowUpRight aria-hidden="true" />
+          </span>
+          <strong>{counts.favorites} importantes</strong>
+          <small>Para manter por perto</small>
         </Link>
         <button onClick={() => setTab("rhythm")} type="button">
-          <TrendingUp aria-hidden="true" />
-          <span>Ritmo</span>
-          <strong>
-            {rhythm.activeDays} {rhythm.activeDays === 1 ? "dia" : "dias"}
-          </strong>
-          <small>Ativos nos últimos 7 dias</small>
+          <span className="dashboard-summary-card-heading">
+            <span>
+              <TrendingUp aria-hidden="true" /> Ritmo
+            </span>
+            <ArrowUpRight aria-hidden="true" />
+          </span>
+          <strong>{rhythm.activeDays} de 7 dias ativos</strong>
+          <small>Baseado nos links salvos</small>
         </button>
       </section>
       <div
         aria-label="Perspectivas do dashboard"
         className="dashboard-tabs"
+        data-tour="dashboard-tabs"
         role="tablist"
       >
         {tabs.map((item) => (
@@ -266,7 +289,7 @@ export function DashboardOverview({
         ))}
       </div>
       {noLinks ? (
-        <section className="dashboard-empty-state">
+        <section className="dashboard-tab-panel dashboard-empty-state">
           <Link2 aria-hidden="true" />
           <h2>Seu ritmo começa aqui.</h2>
           <p>
@@ -274,11 +297,14 @@ export function DashboardOverview({
             espaço.
           </p>
           <LinkCapture />
+          <small className="dashboard-capture-note">
+            Os links novos entram na Inbox.
+          </small>
         </section>
       ) : null}
       {!noLinks && tab === "overview" ? (
         <div
-          className="dashboard-overview-grid"
+          className="dashboard-tab-panel dashboard-overview-grid"
           id="dashboard-overview"
           role="tabpanel"
         >
@@ -316,7 +342,7 @@ export function DashboardOverview({
       ) : null}
       {!noLinks && tab === "links" ? (
         <section
-          className="dashboard-links-tab"
+          className="dashboard-tab-panel dashboard-links-tab"
           id="dashboard-links"
           role="tabpanel"
         >
@@ -351,16 +377,23 @@ export function DashboardOverview({
             items={filteredLinks.slice(0, 10)}
             onChange={updateLink}
           />
+          <Link className="dashboard-list-cta" href="/links">
+            Ver todos os links →
+          </Link>
         </section>
       ) : null}
       {!noLinks && tab === "rhythm" ? (
-        <div id="dashboard-rhythm" role="tabpanel">
+        <div
+          className="dashboard-tab-panel dashboard-rhythm-tab"
+          id="dashboard-rhythm"
+          role="tabpanel"
+        >
           <RhythmContent links={links} period={period} setPeriod={setPeriod} />
         </div>
       ) : null}
       {!noLinks && tab === "recent" ? (
         <section
-          className="dashboard-links-tab"
+          className="dashboard-tab-panel dashboard-links-tab"
           id="dashboard-recent"
           role="tabpanel"
         >

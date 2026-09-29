@@ -51,7 +51,12 @@ export function LinkCapture({
   }
 
   return (
-    <form className="link-capture" id="salvar-link" onSubmit={handleSubmit}>
+    <form
+      className="link-capture"
+      data-tour="link-capture"
+      id="salvar-link"
+      onSubmit={handleSubmit}
+    >
       <div className="link-capture-icon" aria-hidden="true">
         <Link2 />
       </div>

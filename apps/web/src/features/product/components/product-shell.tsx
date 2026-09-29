@@ -1,21 +1,14 @@
-import {
-  Archive,
-  ArchiveX,
-  Inbox,
-  LayoutDashboard,
-  Link2,
-  Star,
-} from "lucide-react";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrandLogo } from "@/common/components/brand-logo";
 import { ThemeToggle } from "@/common/components/theme-toggle";
-import { SignOutButton } from "@/features/auth/components/sign-out-button";
+import { DreliTour } from "@/features/onboarding/components/dreli-tour";
+import { ProductAccountMenu } from "@/features/product/components/product-account-menu";
+import { ProductSidebarNavigation } from "@/features/product/components/product-sidebar-navigation";
 import { QuickMenu } from "@/features/product/components/quick-menu";
 import { SaveLinkShortcut } from "@/features/saved-links/components/save-link-shortcut";
-import { SavedLinkCount } from "@/features/saved-links/components/saved-link-counts";
 
 type ProductProfile = {
+  id: string;
   name: string | null;
 };
 
@@ -30,57 +23,19 @@ type ProductSection =
   | "inbox"
   | "library"
   | "favorites"
-  | "archived";
+  | "archived"
+  | "weather"
+  | "news"
+  | "history"
+  | "reports"
+  | "performance"
+  | "profile";
 type LinkCounts = {
   archived: number;
   favorites: number;
   inbox: number;
   library: number;
 };
-
-const navigation: {
-  href: string;
-  icon: typeof LayoutDashboard;
-  label: string;
-  section: ProductSection;
-  count?: keyof LinkCounts;
-}[] = [
-  {
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    label: "Visão geral",
-    section: "dashboard",
-  },
-  { href: "/links", icon: Link2, label: "Links", section: "links" },
-  {
-    href: "/inbox",
-    icon: Inbox,
-    label: "Inbox",
-    section: "inbox",
-    count: "inbox",
-  },
-  {
-    href: "/library",
-    icon: Archive,
-    label: "Biblioteca",
-    section: "library",
-    count: "library",
-  },
-  {
-    href: "/favorites",
-    icon: Star,
-    label: "Favoritos",
-    section: "favorites",
-    count: "favorites",
-  },
-  {
-    href: "/archived",
-    icon: ArchiveX,
-    label: "Arquivados",
-    section: "archived",
-    count: "archived",
-  },
-];
 
 function getInitials(name: string | null, email: string | null) {
   const source = name?.trim() || email?.split("@")[0] || "D";
@@ -112,60 +67,29 @@ export function ProductShell({
 
   return (
     <main className="product-shell">
+      <DreliTour profileId={profile.id} />
       <aside className="product-sidebar" aria-label="Navegação do produto">
         <div className="product-sidebar-top">
           <BrandLogo href="/dashboard" />
-          <nav aria-label="Áreas do Dreli">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = item.section === section;
-
-              return (
-                <Link
-                  aria-current={isActive ? "page" : undefined}
-                  className={
-                    isActive ? "product-nav-item is-active" : "product-nav-item"
-                  }
-                  href={item.href}
-                  key={item.section}
-                >
-                  <Icon aria-hidden="true" />
-                  <span>{item.label}</span>
-                  {item.count ? (
-                    <SavedLinkCount count={item.count} counts={linkCounts} />
-                  ) : null}
-                  {isActive ? (
-                    <i aria-hidden="true" className="product-nav-active-dot" />
-                  ) : null}
-                </Link>
-              );
-            })}
-          </nav>
+          <ProductSidebarNavigation counts={linkCounts} section={section} />
         </div>
 
-        <details className="product-sidebar-account">
-          <summary className="product-account-identity">
-            <span className="product-avatar" aria-hidden="true">
-              {identity.avatarUrl ? (
-                // biome-ignore lint/performance/noImgElement: avatar_url vem de hosts externos do Supabase/Google e não há host fixo para next/image.
-                <img alt="" src={identity.avatarUrl} />
-              ) : (
-                initials.toUpperCase()
-              )}
-            </span>
-            <span className="product-account-copy">
-              <strong>{profile.name ?? "Seu espaço"}</strong>
-              <small>{identity.email ?? "Conta Dreli"}</small>
-            </span>
-          </summary>
-          <div className="product-account-menu">
-            <SignOutButton destructive />
-          </div>
-        </details>
+        <ProductAccountMenu
+          avatarUrl={identity.avatarUrl}
+          email={identity.email}
+          initials={initials}
+          name={profile.name}
+        />
       </aside>
 
       <section className="product-main">
-        <header className="product-header">
+        <header
+          className={
+            section === "dashboard"
+              ? "product-header product-header--dashboard"
+              : "product-header"
+          }
+        >
           <div>
             <h1>{title === "Visão geral" ? `Olá, ${firstName}.` : title}</h1>
             {subtitle ? (
